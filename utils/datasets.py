@@ -601,8 +601,8 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                         break
                 labels = pastein(img, labels, sample_labels, sample_images, sample_masks)
 
-            img, labels = focus_bounding_box(self, img, labels)
             img, labels = random_mask_face(self, img, labels, hyp['mask_face'])
+            img, labels = focus_bounding_box(self, img, labels)
             
             img, labels = self.albumentations(img, labels)
 
