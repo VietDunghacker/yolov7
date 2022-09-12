@@ -1384,7 +1384,7 @@ def find_valid_face(person, faces):
         if valid:
             face_x = (face[0] + face[2]) / 2
             person_x = (person[0] + person[2]) / 2
-            center_distance = (face_x - person_x).abs()
+            center_distance = np.abs(face_x - person_x)
 
             if center_distance < smallest_distance:
                 smallest_distance = center_distance
