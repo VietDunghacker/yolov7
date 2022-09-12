@@ -625,7 +625,6 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
 
         # Convert
         cv2.imwrite("test.jpg", img)
-        assert False
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
         img = np.ascontiguousarray(img)
 
