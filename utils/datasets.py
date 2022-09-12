@@ -1422,6 +1422,8 @@ def focus_bounding_box(self, img, labels):
         crop_x2 = np.random.randint(xmax, s + 1)
         crop_y2 = np.random.randint(ymax, s + 1)
 
+        crop_x1, crop_y1, crop_x2, crop_y2 = xmin, ymin, xmax, ymax
+
         img = img[crop_y1:crop_y2, crop_x1:crop_x2]
         labels[:, 1:] -= [crop_x1, crop_y1, crop_x1, crop_y1]
 
