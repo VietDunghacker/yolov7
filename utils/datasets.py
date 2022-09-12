@@ -581,9 +581,6 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                                                  shear=hyp['shear'],
                                                  perspective=hyp['perspective'])
             
-            
-            img, labels = self.albumentations(img, labels)
-
             # Augment colorspace
             if min([hyp['hsv_h'], hyp['hsv_s'], hyp['hsv_v']]) > 0:
                 augment_hsv(img, hgain=hyp['hsv_h'], sgain=hyp['hsv_s'], vgain=hyp['hsv_v'])
@@ -607,6 +604,8 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             img, labels = random_mask_face(self, img, labels, hyp['mask_face'])
 
             img, labels = focus_bounding_box(self, img, labels)
+
+            img, labels = self.albumentations(img, labels)
 
         nL = len(labels)  # number of labels
         if nL:
@@ -1421,8 +1420,6 @@ def focus_bounding_box(self, img, labels):
         crop_y1 = np.random.randint(0, ymin + 1)
         crop_x2 = np.random.randint(xmax, s + 1)
         crop_y2 = np.random.randint(ymax, s + 1)
-
-        crop_x1, crop_y1, crop_x2, crop_y2 = xmin, ymin, xmax, ymax
 
         img = img[crop_y1:crop_y2, crop_x1:crop_x2]
         labels[:, 1:] -= [crop_x1, crop_y1, crop_x1, crop_y1]
