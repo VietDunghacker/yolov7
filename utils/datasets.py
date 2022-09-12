@@ -1334,13 +1334,13 @@ def random_mask_face(self, img, labels, prob):
     else:
         boxes = []
 
-    if len(boxes) and len(labels) and random.random() < prob:
+    if len(boxes) and len(labels):
         remove_idxs = []
         for idx, label in enumerate(labels):
             person = label[1:]
             erase_idx = find_valid_face(person, boxes)
 
-            if erase_idx >= 0:
+            if erase_idx >= 0 and random.random() < prob:
                 face = boxes[erase_idx]
 
                 y_cropped = max(y_cropped, face[3])
