@@ -1382,9 +1382,9 @@ def find_valid_face(person, faces):
 
     for idx, (face, valid) in enumerate(zip(faces, valid_faces)):
         if valid:
-            face_center = (face[0] + face[2]) / 2, (face[1] + face[3]) / 2
-            person_center = (person[0] + person[2]) / 2, (person[1] + person[3]) / 2
-            center_distance = math.sqrt((face_center[0] - person_center[0]) ** 2 + (face_center[1] - person_center[1]) ** 2)
+            face_x = (face[0] + face[2]) / 2
+            person_x = (person[0] + person[2]) / 2
+            center_distance = (face_x - person_x).abs()
 
             if center_distance < smallest_distance:
                 smallest_distance = center_distance
