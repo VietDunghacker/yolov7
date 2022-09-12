@@ -362,7 +362,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         self.mosaic_border = [-img_size // 2, -img_size // 2]
         self.stride = stride
         self.path = path        
-        #self.albumentations = Albumentations() if augment else None
+        self.albumentations = Albumentations() if augment else None
 
         try:
             f = []  # image files
@@ -578,7 +578,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                                                  perspective=hyp['perspective'])
             
             
-            #img, labels = self.albumentations(img, labels)
+            img, labels = self.albumentations(img, labels)
 
             # Augment colorspace
             augment_hsv(img, hgain=hyp['hsv_h'], sgain=hyp['hsv_s'], vgain=hyp['hsv_v'])
@@ -1222,13 +1222,19 @@ class Albumentations:
         import albumentations as A
 
         self.transform = A.Compose([
-            A.CLAHE(p=0.01),
-            A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.01),
-            A.RandomGamma(gamma_limit=[80, 120], p=0.01),
-            A.Blur(p=0.01),
-            A.MedianBlur(p=0.01),
-            A.ToGray(p=0.01),
-            A.ImageCompression(quality_lower=75, p=0.01),],
+            A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.1, rotate_limit=1, interpolation=1, border_mode=0),
+            A.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
+            A.RGBShift(r_shift_limit=20, g_shift_limit=20, b_shift_limit=20),
+            A.HueSaturationValue(hue_shift_limit=20, sat_shift_limit=30, val_shift_limit=20),
+            A.OneOf([
+                A.Blur(p=1.0),
+                A.MedianBlur(p=1.0),
+            ], p=0.1),
+            A.OneOf([
+                A.ChannelShuffle(p=1.0),
+                A.ToGray(p=1.0),
+            ], p=0.1),
+            A.ImageCompression(quality_lower=75, quality_upper=95)],
             bbox_params=A.BboxParams(format='pascal_voc', label_fields=['class_labels']))
 
             #logging.info(colorstr('albumentations: ') + ', '.join(f'{x}' for x in self.transform.transforms if x.p))
