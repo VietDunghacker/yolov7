@@ -1377,14 +1377,17 @@ def random_mask_face(self, img, labels, prob):
 def find_valid_face(person, faces):
     valid_faces = [valid_face(person, face) for face in faces]
 
-    largest_area = 0
+    smallest_distance = float('inf')
     return_idx = -1
 
     for idx, (face, valid) in enumerate(zip(faces, valid_faces)):
         if valid:
-            face_area = (face[3] - face[1]) * (face[2] - face[0])
-            if face_area > largest_area:
-                largest_area = face_area
+            face_center = (face[0] + face[2]) / 2, (face[1] + face[3]) / 2
+            person_center = (person[0] + person[2]) / 2, (person[1] + person[3]) / 2
+            center_distance = math.sqrt((face_center[0] - person_center[0]) ** 2 + (face_center[1] - person_center[1]) ** 2)
+
+            if center_distance < smallest_distance:
+                smallest_distance = center_distance
                 return_idx = idx
 
     return return_idx
