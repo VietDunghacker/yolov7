@@ -1339,7 +1339,7 @@ def random_mask_face(self, img, labels):
         remove_idxs = []
         for idx, label in enumerate(labels):
             person = label[1:]
-            erase_idx = self.find_valid_face(person, boxes)
+            erase_idx = find_valid_face(person, boxes)
 
             if erase_idx >= 0:
                 face = boxes[erase_idx]
