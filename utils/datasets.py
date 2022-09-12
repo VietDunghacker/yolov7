@@ -1374,7 +1374,7 @@ def random_mask_face(self, img, labels, prob):
             labels = labels[remain_idx]
 
             if len(remain_idx) == 0 and random.random() < 0.5 and y_cropped < s * 0.75:
-                img[:int(y_cropped)] = 0
+                img[:int(y_cropped)] = img[0][0][0]
 
     return img, labels
 
