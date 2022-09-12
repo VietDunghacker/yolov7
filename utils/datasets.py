@@ -604,8 +604,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                         break
                 labels = pastein(img, labels, sample_labels, sample_images, sample_masks)
 
-            if random.random() < 0.25:
-                img, labels = random_mask_face(self, img, labels)
+            img, labels = random_mask_face(self, img, labels, hyp['mask_face'])
 
         nL = len(labels)  # number of labels
         if nL:
@@ -1318,7 +1317,7 @@ def load_segmentations(self, index):
     # /work/handsomejw66/coco17/
     return self.segs[key]
 
-def random_mask_face(self, img, labels):
+def random_mask_face(self, img, labels, prob):
     s = self.img_size
 
     y_cropped = 0
@@ -1335,7 +1334,7 @@ def random_mask_face(self, img, labels):
     else:
         boxes = []
 
-    if len(boxes) and len(labels):
+    if len(boxes) and len(labels) and random.random() < prob:
         remove_idxs = []
         for idx, label in enumerate(labels):
             person = label[1:]
