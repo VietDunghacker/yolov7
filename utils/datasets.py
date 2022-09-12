@@ -569,7 +569,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
 
         if self.augment:
             # Augment imagespace
-            if not mosaic:
+            if not self.mosaic:
                 img, labels = random_perspective(img, labels,
                                                  degrees=hyp['degrees'],
                                                  translate=hyp['translate'],
@@ -1220,7 +1220,7 @@ class Albumentations:
         import albumentations as A
 
         self.transform = A.Compose([
-            A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.1, rotate_limit=1, interpolation=1, border_mode=0),
+            A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.0, rotate_limit=1, interpolation=1, border_mode=0),
             A.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
             A.RGBShift(r_shift_limit=20, g_shift_limit=20, b_shift_limit=20),
             A.HueSaturationValue(hue_shift_limit=20, sat_shift_limit=30, val_shift_limit=20),
