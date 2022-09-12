@@ -1428,5 +1428,6 @@ def focus_bounding_box(self, img, labels):
 
         labels[:, 1:] *= [ratio[0], ratio[1], ratio[0], ratio[1]]
         labels[:, 1:] += [pad[0], pad[1], pad[0], pad[1]]
+        print(labels)
         np.clip(labels[:, 1:], 0, s - 1)
     return img, labels
