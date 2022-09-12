@@ -28,9 +28,7 @@ def check_anchors(dataset, model, thr=4.0, imgsz=640):
     shapes = imgsz * dataset.shapes / dataset.shapes.max(1, keepdims=True)
     scale = np.random.uniform(0.9, 1.1, size=(shapes.shape[0], 1))  # augment scale
     wh = torch.tensor(np.concatenate([l[:, 3:5] * s for s, l in zip(shapes * scale, dataset.labels)])).float()  # wh
-    print(wh[-1])
-    wh = np.concatenate([wh, wh / 2, wh / 3], axis = 0)
-    print(wh[-1])
+    wh = torch.tensor(np.concatenate([wh, wh / 2, wh / 3], axis = 0))
 
     def metric(k):  # compute metric
         r = wh[:, None] / k[None]
