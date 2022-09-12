@@ -604,7 +604,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                         break
                 labels = pastein(img, labels, sample_labels, sample_images, sample_masks)
 
-            if random.random() < 1.0:
+            if random.random() < 0.25:
                 img, labels = random_mask_face(self, img, labels)
 
         nL = len(labels)  # number of labels
@@ -1215,7 +1215,7 @@ class Albumentations:
 
         self.transform = A.Compose([
             A.Cutout(num_holes=25, max_h_size=32, max_w_size=32, fill_value=0, p=1.0),
-            A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.1, rotate_limit=1, interpolation=1, border_mode=0),
+            A.ShiftScaleRotate(shift_limit=0, scale_limit=0.1, rotate_limit=1, interpolation=1, border_mode=0),
             A.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
             A.RGBShift(r_shift_limit=20, g_shift_limit=20, b_shift_limit=20),
             A.HueSaturationValue(hue_shift_limit=20, sat_shift_limit=30, val_shift_limit=20),
