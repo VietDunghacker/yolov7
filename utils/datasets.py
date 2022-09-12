@@ -32,6 +32,8 @@ from utils.torch_utils import torch_distributed_zero_first
 
 from facenet_pytorch import MTCNN
 
+mtcnn = MTCNN(thresholds= [0.7, 0.7, 0.8], min_face_size=32, keep_all=True, device = 'cpu')
+
 # Parameters
 help_url = 'https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data'
 img_formats = ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'dng', 'webp', 'mpo']  # acceptable image suffixes
