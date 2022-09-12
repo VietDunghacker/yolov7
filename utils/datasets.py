@@ -816,7 +816,7 @@ def load_mosaic9(self, index):
     for x in (labels9[:, 1:], *segments9):
         np.clip(x, 0, 3 * s, out=x)  # clip when using random_perspective()
     # img9, labels9 = replicate(img9, labels9)  # replicate
-    img4 = cv2.resize(img4, (s, s), interpolation = cv2.INTER_LANCZOS4)
+    img9 = cv2.resize(img9, (s, s), interpolation = cv2.INTER_LANCZOS4)
     labels4 = labels4[box_candidates(box1=labels4[:, 1:].T, box2=labels4[:, 1:].T / 3, area_thr=0.10)]
     labels4[:, 1:] = labels4[:, 1:] / 3
 
