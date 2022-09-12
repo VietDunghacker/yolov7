@@ -1321,55 +1321,57 @@ def random_mask_face(self, img, labels, prob):
     s = self.img_size
 
     y_cropped = 0
+    selected_labels = [random.random() < prob for _ in labels]
 
-    boxes, scores = mtcnn.detect(img)
-    if boxes is not None:
-        boxes = [boxes[i] for i in range(len(boxes)) if scores[i] >= 0.9]
+    if selected_labels.any():
+        boxes, scores = mtcnn.detect(img)
+        if boxes is not None:
+            boxes = [boxes[i] for i in range(len(boxes)) if scores[i] >= 0.9]
 
-        new_boxes = []
-        for box in boxes:
-            new_boxes.append((max(box[0], 0), max(box[1], 0), min(box[2], s), min(box[3], s)))
-        boxes = new_boxes
-        
-    else:
-        boxes = []
+            new_boxes = []
+            for box in boxes:
+                new_boxes.append((max(box[0], 0), max(box[1], 0), min(box[2], s), min(box[3], s)))
+            boxes = new_boxes
+            
+        else:
+            boxes = []
 
-    if len(boxes) and len(labels):
-        remove_idxs = []
-        for idx, label in enumerate(labels):
-            person = label[1:]
-            erase_idx = find_valid_face(person, boxes)
+        if len(boxes) and len(labels):
+            remove_idxs = []
+            for idx, label in enumerate(labels):
+                person = label[1:]
+                erase_idx = find_valid_face(person, boxes)
 
-            if erase_idx >= 0 and random.random() < prob:
-                face = boxes[erase_idx]
+                if erase_idx >= 0 and selected_labels[idx]:
+                    face = boxes[erase_idx]
 
-                y_cropped = max(y_cropped, face[3])
+                    y_cropped = max(y_cropped, face[3])
 
-                remove_idxs.append(idx)
+                    remove_idxs.append(idx)
 
-                face_width = face[2] - face[0]
-                face_height = face[3] - face[1]
+                    face_width = face[2] - face[0]
+                    face_height = face[3] - face[1]
 
-                x_limit = person[0] + (person[2] - person[0]) * 0.9
-                y_limit = person[1] + (person[3] - person[1]) * 0.9
+                    x_limit = person[0] + (person[2] - person[0]) * 0.9
+                    y_limit = person[1] + (person[3] - person[1]) * 0.9
 
-                x1, y1 = (np.random.randint(max(0, face[0] - face_width / 10), face[0] + 1), np.random.randint(max(0, face[1] - face_height / 10), face[1] + 1))
-                x2, y2 = np.random.randint(min(x1 + face_width * 0.9, x_limit), face[2] + 1), np.random.randint(min(y1 + face_height * 0.9, y_limit), face[3] + 1)
+                    x1, y1 = (np.random.randint(max(0, face[0] - face_width / 10), face[0] + 1), np.random.randint(max(0, face[1] - face_height / 10), face[1] + 1))
+                    x2, y2 = np.random.randint(min(x1 + face_width * 0.9, x_limit), face[2] + 1), np.random.randint(min(y1 + face_height * 0.9, y_limit), face[3] + 1)
 
-                x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+                    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
 
-                mask = np.random.rand(y2 - y1, x2 - x1) >= 0.05
-                cropped_region = img[y1 : y2, x1 : x2]
-                random_color = np.random.randint(0, 256, (y2 - y1, x2 - x1, 3))
-                cropped_region[mask] = random_color[mask]
+                    mask = np.random.rand(y2 - y1, x2 - x1) >= 0.05
+                    cropped_region = img[y1 : y2, x1 : x2]
+                    random_color = np.random.randint(0, 256, (y2 - y1, x2 - x1, 3))
+                    cropped_region[mask] = random_color[mask]
 
-                img[y1 : y2, x1 : x2] = cropped_region
+                    img[y1 : y2, x1 : x2] = cropped_region
 
-                del boxes[erase_idx]
+                    del boxes[erase_idx]
 
-        remain_idx = [i for i in range(len(labels)) if not i in remove_idxs]
+            remain_idx = [i for i in range(len(labels)) if not i in remove_idxs]
 
-        labels = labels[remain_idx]
+            labels = labels[remain_idx]
     return img, labels
 
 def find_valid_face(person, faces):
