@@ -584,8 +584,9 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             if min([hyp['hsv_h'], hyp['hsv_s'], hyp['hsv_v']]) > 0:
                 augment_hsv(img, hgain=hyp['hsv_h'], sgain=hyp['hsv_s'], vgain=hyp['hsv_v'])
 
-            if random.random() < 0.9:
-                labels = cutout(img, labels)
+            # Apply cutouts
+            # if random.random() < 0.9:
+            #     labels = cutout(img, labels)
             
             if random.random() < hyp['paste_in']:
                 sample_labels, sample_images, sample_masks = [], [], [] 
@@ -1206,6 +1207,7 @@ class Albumentations:
         import albumentations as A
 
         self.transform = A.Compose([
+            A.CutOut(num_holes=25, max_h_size=16, max_w_size=16, fill_value=0),
             A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.1, rotate_limit=1, interpolation=1, border_mode=0),
             A.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
             A.RGBShift(r_shift_limit=20, g_shift_limit=20, b_shift_limit=20),
