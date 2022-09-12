@@ -606,6 +606,8 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
 
             img, labels = random_mask_face(self, img, labels, hyp['mask_face'])
 
+            img, labels = focus_bounding_box(self, img, labels)
+
         nL = len(labels)  # number of labels
         if nL:
             labels[:, 1:5] = xyxy2xywh(labels[:, 1:5])  # convert xyxy to xywh
@@ -680,8 +682,7 @@ def load_image(self, index):
         h0, w0 = img.shape[:2]  # orig hw
         r = self.img_size / max(h0, w0)  # resize image to img_size
         if r != 1:  # always resize down, only resize up if training with augmentation
-            interp = cv2.INTER_AREA if r < 1 and not self.augment else cv2.INTER_LINEAR
-            img = cv2.resize(img, (int(w0 * r), int(h0 * r)), interpolation=interp)
+            img = cv2.resize(img, (int(w0 * r), int(h0 * r)), interpolation=cv2.INTER_LANCZOS4)
         return img, (h0, w0), img.shape[:2]  # img, hw_original, hw_resized
     else:
         return self.imgs[index], self.img_hw0[index], self.img_hw[index]  # img, hw_original, hw_resized
@@ -1400,3 +1401,32 @@ def valid_face(person, face):
     person_face_ioa = bbox_ioa(person, np.array([face]))
     assert len(person_face_ioa) == 1
     return person_face_ioa[0] >= 0.975 and face[3] - face[1] >= 10 and face[2] - face[0] >= 10
+
+def focus_bounding_box(self, img, labels):
+    if(len(results['gt_bboxes'] > 0)):
+        s = self.img_size
+        xmin, ymin, xmax, ymax = s, s, 0, 0
+        crop_x1, crop_y1, crop_x2, crop_y2 = 0, 0, 0, 0
+
+        for label in labels:
+            x1, y1, x2, y2 = label[1:]
+            xmin = min(xmin, x1)
+            ymin = min(ymin, y1)
+            xmax = max(xmax, x2)
+            ymax = max(ymax, y2)
+
+        assert xmin < xmax and ymin < ymax
+
+        crop_x1 = np.random.randint(0, xmin + 1)
+        crop_y1 = np.random.randint(0, ymin + 1)
+        crop_x2 = np.random.randint(xmax, w + 1)
+        crop_y2 = np.random.randint(ymax, h + 1)
+
+        img = img[crop_y1:crop_y2, crop_x1:crop_x2]
+        labels[:, 1:] -= [crop_x1, crop_y1, crop_x1, crop_y1]
+
+        img, ratio, pad = letterbox(img, shape, auto=False, scaleup=self.augment)
+
+        labels[:, 1:] *= [ratio[0], ratio[1], ratio[0], ratio[1]]
+        labels[:, 1:] += [pad[0], pad[1], pad[0], pad[1]]
+    return img, labels
