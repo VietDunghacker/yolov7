@@ -30,6 +30,8 @@ from utils.general import check_requirements, xyxy2xywh, xywh2xyxy, xywhn2xyxy, 
     resample_segments, clean_str
 from utils.torch_utils import torch_distributed_zero_first
 
+from facenet_pytorch import MTCNN
+
 # Parameters
 help_url = 'https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data'
 img_formats = ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'dng', 'webp', 'mpo']  # acceptable image suffixes
@@ -599,6 +601,9 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                     if len(sample_labels) == 0:
                         break
                 labels = pastein(img, labels, sample_labels, sample_images, sample_masks)
+
+            if random.random() < 1.0:
+                img, labels = random_mask_face(self, img, labels)
 
         nL = len(labels)  # number of labels
         if nL:
@@ -1310,3 +1315,80 @@ def load_segmentations(self, index):
     #print(key)
     # /work/handsomejw66/coco17/
     return self.segs[key]
+
+def random_mask_face(self, img, labels):
+    s = self.img_size
+
+    y_cropped = 0
+
+    boxes, scores = mtcnn.detect(img)
+    if boxes is not None:
+        boxes = [boxes[i] for i in range(len(boxes)) if scores[i] >= 0.9]
+
+        new_boxes = []
+        for box in boxes:
+            new_boxes.append((max(box[0], 0), max(box[1], 0), min(box[2], s), min(box[3], s)))
+        boxes = new_boxes
+        
+    else:
+        boxes = []
+
+    if len(boxes) and len(labels):
+        remove_idxs = []
+        for idx, label in enumerate(labels):
+            person = label[1:]
+            erase_idx = self.find_valid_face(person, boxes)
+
+            if erase_idx >= 0:
+                face = boxes[erase_idx]
+
+                y_cropped = max(y_cropped, face[3])
+
+                remove_idxs.append(idx)
+
+                face_width = face[2] - face[0]
+                face_height = face[3] - face[1]
+
+                x_limit = person[0] + (person[2] - person[0]) * 0.9
+                y_limit = person[1] + (person[3] - person[1]) * 0.9
+
+                x1, y1 = (random.randint(max(0, face[0] - face_width / 10), face[0] + 1), random.randint(max(0, face[1] - face_height / 10), face[1] + 1))
+                x2, y2 = random.randint(min(x1 + face_width * 0.9, x_limit), face[2] + 1), random.randint(min(y1 + face_height * 0.9, y_limit), face[3] + 1)
+
+                x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+
+                mask = np.random.rand(y2 - y1, x2 - x1) >= 0.05
+                cropped_region = img[y1 : y2, x1 : x2]
+                random_color = np.random.randint(0, 256, (y2 - y1, x2 - x1, 3))
+                cropped_region[mask] = random_color[mask]
+
+                img[y1 : y2, x1 : x2] = cropped_region
+
+                del boxes[erase_idx]
+
+        remain_idx = [i for i in range(len(labels)) if not i in remove_idxs]
+
+        labels = labels[remain_idx]
+
+        if len(remain_idx) == 0 and random.random() < 0.5 and y_cropped < s * 0.75:
+            img = img[int(y_cropped) : img.shape[0]]
+
+    return img, labels
+
+def find_valid_face(person, faces):
+    valid_faces = [valid_face(person, face) for face in faces]
+
+    largest_area = 0
+    return_idx = -1
+
+    for idx, (face, valid) in enumerate(zip(faces, valid_faces)):
+        if valid:
+            face_area = (face[3] - face[1]) * (face[2] - face[0])
+            if face_area > largest_area:
+                largest_area = face_area
+                return_idx = idx
+
+    return return_idx
+
+def valid_face(person, face):
+    return face[0] >= person[0] - 5 and face[1] >= person[1] - 5 and face[2] <= person[2] + 5 and face[3] <= person[3] + 5 and abs(face[1] - person[1]) <= (person[3] - person[1]) / 5 and face[3] - face[1] >= 10 and face[2] - face[0] >= 10
