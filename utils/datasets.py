@@ -1371,10 +1371,6 @@ def random_mask_face(self, img, labels):
         remain_idx = [i for i in range(len(labels)) if not i in remove_idxs]
 
         labels = labels[remain_idx]
-
-        if len(remain_idx) == 0 and random.random() < 0.5 and y_cropped < s * 0.75:
-            img = img[int(y_cropped) : img.shape[0]]
-
     return img, labels
 
 def find_valid_face(person, faces):
