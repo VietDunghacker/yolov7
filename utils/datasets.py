@@ -579,7 +579,6 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             
             
             img, labels = self.albumentations(img, labels)
-            cv2.imwrite("test1.jpg", img)
 
             # Augment colorspace
             if min([hyp['hsv_h'], hyp['hsv_s'], hyp['hsv_v']]) > 0:
@@ -625,7 +624,6 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             labels_out[:, 1:] = torch.from_numpy(labels)
 
         # Convert
-        cv2.imwrite("test2.jpg", img)
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
         img = np.ascontiguousarray(img)
 
