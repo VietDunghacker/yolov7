@@ -713,7 +713,7 @@ def load_mosaic(self, index):
 
     labels4, segments4 = [], []
     s = self.img_size
-    yc, xc = [int(random.uniform(0.8 * s, 1.2 * s)) for x in self.mosaic_border]  # mosaic center x, y
+    yc, xc = [int(random.uniform(0.9 * s, 1.1 * s)) for x in self.mosaic_border]  # mosaic center x, y
     indices = [index] + random.choices(self.indices, k=3)  # 3 additional image indices
     for i, index in enumerate(indices):
         # Load image
@@ -817,8 +817,8 @@ def load_mosaic9(self, index):
         np.clip(x, 0, 3 * s, out=x)  # clip when using random_perspective()
     # img9, labels9 = replicate(img9, labels9)  # replicate
     img9 = cv2.resize(img9, (s, s), interpolation = cv2.INTER_LANCZOS4)
-    labels4 = labels4[box_candidates(box1=labels4[:, 1:].T, box2=labels4[:, 1:].T / 3, area_thr=0.10)]
-    labels4[:, 1:] = labels4[:, 1:] / 3
+    labels9 = labels9[box_candidates(box1=labels9[:, 1:].T, box2=labels9[:, 1:].T / 3, area_thr=0.10)]
+    labels9[:, 1:] = labels9[:, 1:] / 3
 
     # Augment
     #img9, labels9, segments9 = remove_background(img9, labels9, segments9)
