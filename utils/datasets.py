@@ -579,6 +579,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             
             
             img, labels = self.albumentations(img, labels)
+            cv2.imwrite("test1.jpg", img)
 
             # Augment colorspace
             if min([hyp['hsv_h'], hyp['hsv_s'], hyp['hsv_v']]) > 0:
@@ -624,7 +625,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             labels_out[:, 1:] = torch.from_numpy(labels)
 
         # Convert
-        cv2.imwrite("test.jpg", img)
+        cv2.imwrite("test2.jpg", img)
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
         img = np.ascontiguousarray(img)
 
@@ -810,31 +811,18 @@ def load_mosaic9(self, index):
         img9[y1:y2, x1:x2] = img[y1 - pady:, x1 - padx:]  # img9[ymin:ymax, xmin:xmax]
         hp, wp = h, w  # height, width previous
 
-    # Offset
-    yc, xc = [int(random.uniform(0, s)) for _ in self.mosaic_border]  # mosaic center x, y
-    img9 = img9[yc:yc + 2 * s, xc:xc + 2 * s]
-
     # Concat/clip labels
     labels9 = np.concatenate(labels9, 0)
-    labels9[:, [1, 3]] -= xc
-    labels9[:, [2, 4]] -= yc
-    c = np.array([xc, yc])  # centers
-    segments9 = [x - c for x in segments9]
-
     for x in (labels9[:, 1:], *segments9):
-        np.clip(x, 0, 2 * s, out=x)  # clip when using random_perspective()
+        np.clip(x, 0, 3 * s, out=x)  # clip when using random_perspective()
     # img9, labels9 = replicate(img9, labels9)  # replicate
+    img4 = cv2.resize(img4, (s, s), interpolation = cv2.INTER_LANCZOS4)
+    labels4 = labels4[box_candidates(box1=labels4[:, 1:].T, box2=labels4[:, 1:].T / 3, area_thr=0.10)]
+    labels4[:, 1:] = labels4[:, 1:] / 3
 
     # Augment
     #img9, labels9, segments9 = remove_background(img9, labels9, segments9)
     img9, labels9, segments9 = copy_paste(img9, labels9, segments9, probability=self.hyp['copy_paste'])
-    img9, labels9 = random_perspective(img9, labels9, segments9,
-                                       degrees=self.hyp['degrees'],
-                                       translate=self.hyp['translate'],
-                                       scale=self.hyp['scale'],
-                                       shear=self.hyp['shear'],
-                                       perspective=self.hyp['perspective'],
-                                       border=self.mosaic_border)  # border to remove
 
     return img9, labels9
 
