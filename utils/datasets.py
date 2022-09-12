@@ -1323,7 +1323,7 @@ def random_mask_face(self, img, labels, prob):
     y_cropped = 0
     selected_labels = [random.random() < prob for _ in labels]
 
-    if selected_labels.any():
+    if any(selected_labels):
         boxes, scores = mtcnn.detect(img)
         if boxes is not None:
             boxes = [boxes[i] for i in range(len(boxes)) if scores[i] >= 0.9]
