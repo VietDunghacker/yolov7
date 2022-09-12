@@ -1422,6 +1422,7 @@ def focus_bounding_box(self, img, labels):
         crop_y2 = np.random.randint(ymax, s + 1)
 
         img = img[crop_y1:crop_y2, crop_x1:crop_x2]
+        print(labels[:, 1:])
         labels[:, 1:] -= [crop_x1, crop_y1, crop_x1, crop_y1]
 
         img, ratio, pad = letterbox(img, s, auto=False, scaleup=self.augment)
@@ -1429,4 +1430,5 @@ def focus_bounding_box(self, img, labels):
         labels[:, 1:] *= [ratio[0], ratio[1], ratio[0], ratio[1]]
         labels[:, 1:] += [pad[0], pad[1], pad[0], pad[1]]
         labels = np.clip(labels[:, 1:], 0, s - 1)
+        print(labels[:, 1:])
     return img, labels
