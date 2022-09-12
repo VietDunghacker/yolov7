@@ -751,7 +751,8 @@ def load_mosaic(self, index):
     # img4, labels4 = replicate(img4, labels4)  # replicate
 
     img4 = cv2.resize(img4, (s, s), interpolation = cv2.INTER_LANCZOS4)
-    labels4 = labels4 / 2
+    labels4 = labels4[box_candidates(box1=labels4[:, 1:].T, box2=labels4[:, 1:].T / 2, 0.10)]
+    labels4[:, 1:] = labels4[:, 1:] / 2
 
     # Augment
     #img4, labels4, segments4 = remove_background(img4, labels4, segments4)
