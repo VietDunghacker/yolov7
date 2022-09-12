@@ -1403,7 +1403,7 @@ def valid_face(person, face):
     return person_face_ioa[0] >= 0.975 and face[3] - face[1] >= 10 and face[2] - face[0] >= 10
 
 def focus_bounding_box(self, img, labels):
-    if(len(results['gt_bboxes'] > 0)):
+    if len(labels):
         s = self.img_size
         xmin, ymin, xmax, ymax = s, s, 0, 0
         crop_x1, crop_y1, crop_x2, crop_y2 = 0, 0, 0, 0
