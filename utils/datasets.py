@@ -1377,14 +1377,14 @@ def random_mask_face(self, img, labels, prob):
 def find_valid_face(person, faces):
     valid_faces = [valid_face(person, face) for face in faces]
 
-    largest_ioa = 0
+    largest_area = 0
     return_idx = -1
 
     for idx, (face, valid) in enumerate(zip(faces, valid_faces)):
         if valid:
-            face_person_ioa = bbox_ioa(face, np.array([person]))[0]
-            if face_person_ioa > largest_ioa:
-                largest_ioa = face_person_ioa
+            face_area = (face[3] - face[1]) * (face[2] - face[0])
+            if face_area > largest_area:
+                largest_area = face_area
                 return_idx = idx
 
     return return_idx
@@ -1392,4 +1392,4 @@ def find_valid_face(person, faces):
 def valid_face(person, face):
     person_face_ioa = bbox_ioa(person, np.array([face]))
     assert len(person_face_ioa) == 1
-    return person_face_ioa[0] >= 0.9 and face[3] - face[1] >= 10 and face[2] - face[0] >= 10
+    return person_face_ioa[0] >= 0.975 and face[3] - face[1] >= 10 and face[2] - face[0] >= 10
