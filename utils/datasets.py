@@ -581,7 +581,8 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             img, labels = self.albumentations(img, labels)
 
             # Augment colorspace
-            augment_hsv(img, hgain=hyp['hsv_h'], sgain=hyp['hsv_s'], vgain=hyp['hsv_v'])
+            if min([hyp['hsv_h'], hyp['hsv_s'], hyp['hsv_v']]) > 0:
+                augment_hsv(img, hgain=hyp['hsv_h'], sgain=hyp['hsv_s'], vgain=hyp['hsv_v'])
 
             # Apply cutouts
             # if random.random() < 0.9:
