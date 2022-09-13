@@ -16,7 +16,7 @@ def gsutil_getsize(url=''):
     return eval(s.split(' ')[0]) if len(s) else 0  # bytes
 
 
-def attempt_download(file, repo='VietDunghacker/yolov7'):
+def attempt_download(file, repo='WongKinYiu/yolov7'):
     # Attempt file download if does not exist
     file = Path(str(file).strip().replace("'", ''))
 
@@ -28,8 +28,8 @@ def attempt_download(file, repo='VietDunghacker/yolov7'):
         except:  # fallback plan
             assets = ['yolov7.pt', 'yolov7-tiny.pt', 'yolov7x.pt', 'yolov7-d6.pt', 'yolov7-e6.pt', 
                       'yolov7-e6e.pt', 'yolov7-w6.pt']
-            tag = subprocess.check_output('git tag', shell=True).decode().split()[-1]
-
+            tag = "v0.1"
+            
         name = file.name
         if name in assets:
             msg = f'{file} missing, try downloading from https://github.com/{repo}/releases/'
