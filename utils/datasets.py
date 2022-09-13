@@ -542,10 +542,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         mosaic = self.mosaic and random.random() < hyp['mosaic']
         if mosaic:
             # Load mosaic
-            if random.random() < 0.8:
-                img, labels = load_mosaic(self, index)
-            else:
-                img, labels = load_mosaic9(self, index)
+            img, labels = load_mosaic(self, index)
             shapes = None
 
             # MixUp https://arxiv.org/pdf/1710.09412.pdf
