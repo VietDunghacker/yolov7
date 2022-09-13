@@ -1400,7 +1400,7 @@ def find_valid_face(person, faces):
 def valid_face(person, face):
     person_face_ioa = bbox_ioa(person, np.array([face]))
     assert len(person_face_ioa) == 1
-    return person_face_ioa[0] >= 0.975 and face[3] - face[1] >= 10 and face[2] - face[0] >= 10
+    return face[0] >= person[0] - 5 and face[1] >= person[1] - 5 and face[2] <= person[2] + 5 and face[3] <= person[3] + 5 and face[3] - face[1] >= 10 and face[2] - face[0] >= 10
 
 def focus_bounding_box(self, img, labels):
     if len(labels):
