@@ -1358,6 +1358,8 @@ def random_mask_face(self, img, labels, prob):
                     x2, y2 = np.random.randint(min(x1 + face_width * 0.9, x_limit), face[2] + 1), np.random.randint(min(y1 + face_height * 0.9, y_limit), face[3] + 1)
 
                     x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+                    assert x1 < x2, "x1 is {}, x2 is {}".format(x1, x2)
+                    assert y1 < y2, "y1 is {}, y2 is {}".format(y1, y2)
 
                     mask = np.random.rand(y2 - y1, x2 - x1) >= 0.05
                     cropped_region = img[y1 : y2, x1 : x2]
