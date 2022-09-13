@@ -1354,10 +1354,6 @@ def random_mask_face(self, img, labels, prob):
                     x_limit = person[0] + (person[2] - person[0]) * 0.9
                     y_limit = person[1] + (person[3] - person[1]) * 0.9
 
-                    if face[0] >= x_limit or face[1] >= y_limit:
-                        del boxes[erase_idx]
-                        continue
-
                     x1, y1 = (np.random.randint(max(0, face[0] - face_width / 10), face[0] + 1), np.random.randint(max(0, face[1] - face_height / 10), face[1] + 1))
                     x2, y2 = np.random.randint(min(x1 + face_width * 0.9, x_limit), face[2] + 1), np.random.randint(min(y1 + face_height * 0.9, y_limit), face[3] + 1)
 
