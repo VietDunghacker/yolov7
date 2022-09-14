@@ -1414,10 +1414,10 @@ def focus_bounding_box(self, img, labels):
 
         assert xmin < xmax and ymin < ymax
 
-        crop_x1 = np.random.randint(xmin / 2, xmin + 1)
-        crop_y1 = np.random.randint(ymin / 2, ymin + 1)
-        crop_x2 = np.random.randint(xmax + (s - xmax) / 2, s + 1)
-        crop_y2 = np.random.randint(ymax + (s - ymax) / 2, s + 1)
+        crop_x1 = np.random.randint(0, xmin + 1)
+        crop_y1 = np.random.randint(0, ymin + 1)
+        crop_x2 = np.random.randint(xmax, s + 1)
+        crop_y2 = np.random.randint(ymax, s + 1)
 
         img = img[crop_y1:crop_y2, crop_x1:crop_x2]
         labels[:, 1:] -= [crop_x1, crop_y1, crop_x1, crop_y1]
